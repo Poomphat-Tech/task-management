@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from './tasks/tasks.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { config } from 'rxjs';
 
 @Module({
   imports: [
@@ -14,6 +13,11 @@ import { config } from 'rxjs';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
+        console.log(
+          `test app ${configService.get('STAGE')} and ${configService.get(
+            'DB_HOST',
+          )}`,
+        );
         return {
           uri: configService.get('DB_HOST'),
         };
