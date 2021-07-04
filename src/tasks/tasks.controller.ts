@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Task } from 'schemas/task.schema';
+import { Task } from '../schemas/task.schema';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
@@ -23,7 +23,7 @@ export class TasksController {
 
   @Get('/:id')
   getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.taskService.getTaskbyId(id);
+    return this.taskService.getTaskById(id);
   }
 
   @Put('/:id')

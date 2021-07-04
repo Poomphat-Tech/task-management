@@ -1,33 +1,46 @@
-import { Model } from 'mongoose';
+import { NotFoundException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Task, TaskDocument } from 'schemas/task.schema';
+import { Task } from '../schemas/task.schema';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
-  constructor(
-    @InjectModel(Task.name) private taskModel: Model<TaskDocument>,
-    private taskRepository: TaskRepository,
-  ) {}
+  constructor(private taskRepository: TaskRepository) {}
 
-  async getTasks(): Promise<Task[]> {
-    return this.taskRepository.getTasks();
+  private async catchError(fn: Promise<any>): Promise<any> {
+    const result = await fn
+      .then((resolve) => {
+        return Promise.resolve(resolve);
+      })
+      .catch((error) => {
+        console.log(error.message);
+        throw new NotFoundException();
+      });
+    return result;
   }
 
-  async getTaskbyId(id: string): Promise<Task> {
-    return this.taskRepository.getTaskById(id);
+  async getTasks(): Promise<Task[]> {
+    const result = await this.catchError(this.taskRepository.getTasks());
+    return result;
+  }
+
+  async getTaskById(id: string): Promise<Task> {
+    const result = await this.catchError(this.taskRepository.getTaskById(id));
+    return result;
   }
 
   async updateTask(updateTaskDto: UpdateTaskDto, id: string): Promise<Task> {
-    return this.taskRepository.updateTask(updateTaskDto, id);
+    const result = await this.catchError(
+      this.taskRepository.updateTask(updateTaskDto, id),
+    );
+    return result;
   }
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    return this.taskRepository.createTask(createTaskDto);
+    return this.catchError(this.taskRepository.createTask(createTaskDto));
   }
   async deleteTask(id: string): Promise<void> {
-    this.taskRepository.deleteTask(id);
+    this.catchError(this.taskRepository.deleteTask(id));
   }
 }
